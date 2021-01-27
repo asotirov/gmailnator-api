@@ -3,13 +3,14 @@ const cheerio = require('cheerio');
 const url = require('url');
 
 exports.generateEmail = (cb) =>{
-	got("https://gmailnator.com/", {
+	got("https://www.gmailnator.com/", {
 		headers: {
-			"Host": "gmailnator.com",
+			"Host": "www.gmailnator.com",
 			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 			"Accept-Language": "en-US,en;q=0.5",
 			"Accept-Encoding": "gzip, deflate, br",
+			"Connection": "keep-alive",
 			"DNT": "1",
 			"Connection": "keep-alive",
 			"Upgrade-Insecure-Requests": "1"
@@ -20,21 +21,23 @@ exports.generateEmail = (cb) =>{
 		var bodyD = "csrf_gmailnator_token=" + csrf + "&action=GenerateEmail&data%5B%5D=2&data%5B%5D=3";
 		var l1 = encodeURIComponent(bodyD).match(/%[89ABab]/g);
 		var l = bodyD.length + (l1 ? l1.length : 0)
-		got.post("https://gmailnator.com/index/indexquery", {
+		got.post("https://www.gmailnator.com/index/indexquery", {
 			body: bodyD,
 			headers: {
-				"Host": "gmailnator.com",
+				"Host": "www.gmailnator.com",
 				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
 				"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 				"Accept-Language": "en-US,en;q=0.5",
 				"Accept-Encoding": "gzip, deflate, br",
+				"Connection": "keep-alive",
+				"Upgrade-Insecure-Requests": "1",
 				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
 				"X-Requested-With": "XMLHttpRequest",
 				"Content-Length": l,
-				"Origin": "https://gmailnator.com/",
+				"Origin": "https://www.gmailnator.com/",
 				"DNT": "1",
 				"Connection": "keep-alive",
-				"Referer": "https://gmailnator.com",
+				"Referer": "https://www.gmailnator.com",
 				"Cookie": "csrf_gmailnator_cookie=" + csrf,
 				"TE": "Trailers"
 			}
