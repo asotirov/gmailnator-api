@@ -23,7 +23,8 @@
   "homepage": "https://github.com/n0rmancodes/gmailnator-api#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "got": "^11.7.0"
+    "got": "^11.7.0",
+    "tunnel": "0.0.6"
   },
   "devDependencies": {},
   "directories": {
