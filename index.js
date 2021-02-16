@@ -1,8 +1,18 @@
 const got = require("got");
 const cheerio = require('cheerio');
 const url = require('url');
-
-exports.generateEmail = (cb) =>{
+const tunnel = require('tunnel');
+let getProxy = function(proxy) {
+	return proxy ? { agent: {
+			https: tunnel.httpsOverHttp({
+				proxy: {
+					host: proxy.split(':')[0],
+					port: proxy.split(':')[1]
+				}
+			})
+		}} : {}
+}
+exports.generateEmail = (cb, proxy = null) =>{
 	got("https://www.gmailnator.com/", {
 		headers: {
 			"Host": "www.gmailnator.com",
@@ -14,7 +24,8 @@ exports.generateEmail = (cb) =>{
 			"DNT": "1",
 			"Connection": "keep-alive",
 			"Upgrade-Insecure-Requests": "1"
-		}
+		},
+		...getProxy(proxy)
 	}).then(function(response) {
 		var $ = cheerio.load(response.body);
 		var csrf = $("#csrf-token")[0].attribs.content;
@@ -23,6 +34,7 @@ exports.generateEmail = (cb) =>{
 		var l = bodyD.length + (l1 ? l1.length : 0)
 		got.post("https://www.gmailnator.com/index/indexquery", {
 			body: bodyD,
+			...getProxy(proxy),
 			headers: {
 				"Host": "www.gmailnator.com",
 				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
@@ -51,7 +63,7 @@ exports.generateEmail = (cb) =>{
 	})
 }
 
-exports.checkEmails = (email, cb) => {
+exports.checkEmails = (email, cb, proxy = null) => {
 	if (!email) {
 		console.error("Needs email param");
 		return false;
@@ -63,6 +75,7 @@ exports.checkEmails = (email, cb) => {
 	}
 	var iburl = "https://www.gmailnator.com/inbox/#" + email
 	got(iburl, {
+		...getProxy(proxy),
 		headers: {
 			"Host": "www.gmailnator.com",
 			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
@@ -82,6 +95,8 @@ exports.checkEmails = (email, cb) => {
 		let cfd_uid_cookie = response.headers['set-cookie'][0].split(';')[0];
 		got.post("https://www.gmailnator.com/mailbox/mailboxquery", {
 			body: data,
+
+			...getProxy(proxy),
 			headers: {
 				"Host": "www.gmailnator.com",
 				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
@@ -144,7 +159,7 @@ exports.checkEmails = (email, cb) => {
 	})
 }
 
-exports.getMessage = (str, csrf, ci_session_cookie, cfd_uid_cookie, cb) => {
+exports.getMessage = (str, csrf, ci_session_cookie, cfd_uid_cookie, cb, proxy = null) => {
 	if (!str | !csrf) {
 		cb("Needs email or csrf_token param", null);
 		return false;
@@ -157,6 +172,7 @@ exports.getMessage = (str, csrf, ci_session_cookie, cfd_uid_cookie, cb) => {
 	var l = data.length + (l1 ? l1.length : 0)
 	got.post("https://gmailnator.com/mailbox/get_single_message/", {
 		body: data,
+		...getProxy(proxy),
 		headers: {
 			"Host": "www.gmailnator.com",
 			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0",
